@@ -56,12 +56,14 @@ class CacheClass implements InvocationHandler {
         for (Map<Field, Object> keyF : cacheValues.keySet()) {
             for (Method keyM : cacheValues.get(keyF).keySet()) {
                 if (cacheValues.get(keyF).get(keyM).checkLifeTime()) {
+                    System.out.println("Удалено для метода " + keyM.getName());
                     cacheValues.get(keyF).remove(keyM); // удаляем кэш для данного метода
-                }
-                if (cacheValues.get(keyF).size() == 0) { // удалим из кэша запись и для состояния
-                    cacheValues.remove(keyF);
+                    System.out.println("после удаления");
                 }
             }
+//            if (cacheValues.get(keyF).size() == 0) { // удалим из кэша запись и для состояния
+//                cacheValues.remove(keyF);
+//            }
         }
     }
 
@@ -123,6 +125,7 @@ class DataCache {
 
     // если вреся жизни кэша истекло, вернёт true
     public boolean checkLifeTime() {
+        if (this.lifeTime == 0) return false; // если 0, то бессрочно
         return Instant.now().toEpochMilli() > this.dateSave + this.lifeTime;
     }
 }

@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Starter {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         Fraction fraction = new Fraction(7, 2);
         Fractionable fproxy = Utils.cache(fraction);
 
@@ -21,7 +21,9 @@ public class Starter {
         Fraction fraction1 = new Fraction(7, 2);
         Fractionable fproxy1 = Utils.cache(fraction);
 
+        Thread.sleep(2000);
         System.out.println(ListObjCache.cacheObj.size());
+        ListObjCache.cleanCache();
         /*        System.out.println(fproxy.doubleValue());
         fproxy.setDenum(4);
         System.out.println(fproxy.doubleValue());
