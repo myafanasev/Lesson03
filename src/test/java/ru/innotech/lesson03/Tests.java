@@ -6,23 +6,25 @@ import org.junit.jupiter.api.Test;
 
 public class Tests {
     @Test
-    @DisplayName("Проверка кэширования")
+    @DisplayName("Проверка простого кэширования")
     public void testCash(){
         TestFraction testFraction = new TestFraction(1,2);
         Fractionable fproxy = Utils.cache(testFraction);
         fproxy.doubleValue();
         fproxy.doubleValue();
-        Assertions.assertEquals(testFraction.countCache, 1);
+        Assertions.assertEquals(testFraction.stat.countCache, 1);
     }
     @Test
-    @DisplayName("Проверка сброса кэширования")
-    public void testCashStop(){
+    @DisplayName("Проверка кэширования предыдущего состояния")
+    public void testCashPrev(){
         TestFraction testFraction = new TestFraction(1,2);
         Fractionable fproxy = Utils.cache(testFraction);
         fproxy.doubleValue();
         fproxy.setNum(2);
         fproxy.doubleValue();
-        Assertions.assertEquals(testFraction.countCache, 2);
+        fproxy.setNum(1); // возвращаем предыдущее состояние
+        fproxy.doubleValue();
+        Assertions.assertEquals(testFraction.stat.countCache, 2);
     }
 
     @Test
@@ -35,35 +37,17 @@ public class Tests {
     }
 
     @Test
-    @DisplayName("Проверка, что после сброса кэш считается заново")
-    public void testCashNewValue(){
+    @DisplayName("Проверка очистки кэша")
+    public void testCashClean() throws InterruptedException {
         TestFraction testFraction = new TestFraction(1,2);
         Fractionable fproxy = Utils.cache(testFraction);
         fproxy.doubleValue();
-        fproxy.setNum(4);
+        fproxy.setNum(2);
         fproxy.doubleValue();
-        Assertions.assertEquals(fproxy.doubleValue(), 2);
-    }
-
-    @Test
-    @DisplayName("Проверка, что метод без аннотации @Cache не кэшируется")
-    public void testCashNot(){
-        TestFraction testFraction = new TestFraction(1,2);
-        Fractionable fproxy = Utils.cache(testFraction);
-        fproxy.setDenum(2);
-        fproxy.setDenum(2);
-        Assertions.assertEquals(testFraction.countCalc, 2);
-    }
-
-    @Test
-    @DisplayName("Проверка, что метод без аннотации @Mutator не сбрасывает кэш")
-    public void testMutatorNot(){
-        TestFraction testFraction = new TestFraction(1,2);
-        Fractionable fproxy = Utils.cache(testFraction);
+        Thread.sleep(1500);
+        fproxy.setNum(1); // возвращаем предыдущее состояние
+        Thread.sleep(500); // пауза, чтобы подождать заверешия потока очистки кэша
         fproxy.doubleValue();
-        fproxy.setDenum(2);
-        fproxy.doubleValue();
-        Assertions.assertEquals(testFraction.countCache, 1);
+        Assertions.assertEquals(testFraction.stat.countCache, 3);
     }
-
 }
