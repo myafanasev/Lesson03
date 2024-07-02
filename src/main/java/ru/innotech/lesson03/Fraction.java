@@ -26,10 +26,4 @@ public class Fraction implements Fractionable {
         return (double) num/denum;
     }
 
-    @Override
-    @Cache(200)
-    public double sumValue() {
-        System.out.println("invoke sum value");
-        return num + denum;
-    }
 }
